@@ -141,37 +141,30 @@ class ComparePhononBS:
         plt.ylabel("Phonons RMS (THz)")
         plt.savefig(filename, format=format)
 
-    #TODO: implement test!
-    def compare_plot(self, filename="band_comparison.eps",img_format="eps"):
+    def compare_plot(self, filename="band_comparison.eps", img_format="eps"):
         plotter = PhononBSPlotter(bs=self.bs1)
         plotter2 = PhononBSPlotter(bs=self.bs2)
-        new_plotter=plotter.plot_compare(plotter2)
+        new_plotter = plotter.plot_compare(plotter2)
         new_plotter.savefig(filename, format=img_format)
         new_plotter.close()
 
     def rms_overall(self):
         diff = self.bands1 - self.bands2
         return np.sqrt(np.mean(diff ** 2))
-     
-    def rms_overall_second_definition(self):
-        #makes sure the frequencies are sorted by energy
-        band1= np.sort(self.bands1,axis=0)
-        band2= np.sort(self.bands2,axis=0)
-        diff=band1-band2
-        return np.sqrt(np.mean(diff ** 2)) 
-        
-    def mean_absolute_error(self):
-        band1= np.sort(self.bands1,axis=0)
-        band2= np.sort(self.bands2,axis=0)
-        diff_perc=(np.abs(band1-band2))/band1
-        return np.mean(np.abs(diff_perc))
-          
-   
-       
-      
-       
-     
 
+    def rms_overall_second_definition(self):
+        # makes sure the frequencies are sorted by energy
+        # otherwise the same as rms_overall
+        band1 = np.sort(self.bands1, axis=0)
+        band2 = np.sort(self.bands2, axis=0)
+        diff = band1 - band2
+        return np.sqrt(np.mean(diff ** 2))
+    #not used
+    # def mean_absolute_error(self):
+    #     band1 = np.sort(self.bands1, axis=0)
+    #     band2 = np.sort(self.bands2, axis=0)
+    #     diff_perc = (np.abs(band1 - band2)) / band1
+    #     return np.mean(np.abs(diff_perc))
 
 
 class PhonopyFiniteDisplacements:
@@ -209,6 +202,7 @@ class PhonopyFiniteDisplacements:
         return get_structure(atoms)
 
     def _get_bandstructure_calc(self, structure, phonon, npoints_band=51):
+        #TODO: add option to save yaml file with eigenvalues in future versions
         tempfilename = tempfile.gettempprefix() + '.yaml'
         kpath_dict, kpath_concrete = get_kpath(structure)
         qpoints, connections = get_band_qpoints_and_path_connections(kpath_concrete, npoints=npoints_band)
@@ -248,63 +242,16 @@ class PhonopyFiniteDisplacements:
         return self.phonon_dos_pymatgen.helmholtz_free_energy(t=temperature, structure=self.optimized_structure)
 
 
-#
-# class PhonopyVaspEvaluator(PhonopyFiniteDisplacements):
-#     """
-#     Class to evaluate a phonon calculation with phonopy and vasp
-#     1. needs POSCAR and FORCE_SETS files
-#     2. will generate phonopy object
-#     3. will calculate bands/dos based on this
-#     """
-#
-#     def __init__(self, poscarpath="POSCAR", forcespath="FORCE_SETS", smat=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
-#                  path_parameters="phonopy.yaml", save_parameters=True,
-#                  npoints_band=51, kpoint_density=12000):
-#         self.optimized_structure = Structure.from_file(poscarpath)
-#         self.smat = smat
-#         self.path_parameters = path_parameters
-#         self.save_parameters = save_parameters
-#         self.npoints_band = npoints_band
-#         self.kpoint_density = kpoint_density
-#         self.poscarpath = poscarpath
-#         self.forcespath = forcespath
-#
-#     def run_all(self):
-#         self.phonon = self._get_phononobject_phonopy(poscarpath=self.poscarpath, forcespath=self.forcespath,
-#                                                      smat=self.smat, save_parameters=self.save_parameters,
-#                                                      path=self.path_parameters)
-#
-#         self.phonon_band_structure_pymatgen = self._get_bandstructure_calc(structure=self.optimized_structure,
-#                                                                            phonon=self.phonon,
-#                                                                            npoints_band=self.npoints_band)
-#         self.phonon_dos_pymatgen = self._get_dos_calc(structure=self.optimized_structure, phonon=self.phonon,
-#                                                       kpoint_density=self.kpoint_density)
-#
-#     def _get_phononobject_phonopy(self, poscarpath, forcespath, smat, save_parameters=False, path="phonopy.yaml"):
-#         phonon = load(supercell_matrix=smat, unitcell_filename=poscarpath, force_sets_filename=forcespath,
-#                       symprec=10e-5)
-#         if save_parameters:
-#             phonon.save(path)
-#         return phonon
 
 
 class PhononsQuippyFiniteDisplacements(PhonopyFiniteDisplacements):
     """
-    Class to optimize structure and calculate phonon properties
-    1. will take a structure object from pymatgen
-    2. will calculate primitive cell
-    3. will optimize primitive cell with potential and ase -> will be able to export this structure!
-    4. will get displacements with phonopy and calculate forces -> will be able to export it as FORCES_SETS
-    5. will get kpath for the calculation of the band structure
-    6. will calculate dos
-    7. will export dos and bandstructure to file
-    8. will have the option to read in phonopy stuff to pymatgen -> will be able to export bands
-    9. will be able to produce nice graphs and
-    10. will calculate everything related to thermal conductivity if I say so
+    Class to optimize structure and calculate phonon properties with GAP potentials
     """
 
     def __init__(self, structure: Structure, potential, smat=None, path_parameters="phonopy.yaml",
-                 npoints_band: int =51, kpoint_density: float=12000, kpoint_density_phono3py=1000, displacementdistance=0.01,
+                 npoints_band: int = 51, kpoint_density: float = 12000, kpoint_density_phono3py=1000,
+                 displacementdistance=0.01,
                  set_phonons=True,
                  set_thermal_conductivity: bool = False,
                  displacementdistancephono3py: float = 0.03, work_with_primitive: bool = True,
@@ -312,21 +259,7 @@ class PhononsQuippyFiniteDisplacements(PhonopyFiniteDisplacements):
                  temperature_range_kappa=range(50, 1001, 5)):
         """
         Class to optimize structure and calculate phonon properties with (GAP) potentials
-        Args:
-            structure:
-            potential:
-            smat:
-            path_parameters:
-            npoints_band:
-            kpoint_density:
-            kpoint_density_phono3py:
-            displacementdistance:
-            set_phonons:
-            set_thermal_conductivity:
-            displacementdistancephono3py:
-            work_with_primitive:
-            max_distance_third_order:
-            temperature_range_kappa:
+
         """
         self.initial_structure = structure
         self.potential = potential
@@ -393,9 +326,6 @@ class PhononsQuippyFiniteDisplacements(PhonopyFiniteDisplacements):
                 self.kappa_mean.append((value[0] + value[1] + value[2]) / 3.0)
 
     def kappa_at_temperature(self, temperature=100, whichvalue='xx'):
-        # return a  kappa at a certain temperature
-        # print(self.temperature_range_kappa)
-        # print(self.kappa_xx)
         for itemp, temp in enumerate(self.temperature_range_kappa):
             if temp == temperature:
                 if whichvalue == "xx":
@@ -484,10 +414,8 @@ class PhononsQuippyFiniteDisplacements(PhonopyFiniteDisplacements):
                                      max_distance_third_order):
         cell = get_phonopy_structure(structure)
 
-        # TODO: get a mesh with a high-enough accuracy
         kpoint = Kpoints.automatic_density(structure=structure, kppa=kpoint_density, force_gamma=True)
         mesh = kpoint.kpts[0]
-        # print(mesh)
         phono3py = Phono3py(cell,
                             self.smat,
                             primitive_matrix=[[1, 0., 0.],
@@ -499,29 +427,24 @@ class PhononsQuippyFiniteDisplacements(PhonopyFiniteDisplacements):
         phono3py.generate_displacements(distance=displacementdistancephono3py,
                                         cutoff_pair_distance=max_distance_third_order)
         scells_with_disps = phono3py.get_supercells_with_displacements()
-        #for scell in scells_with_disps:
-        #    print(scell)
 
         disp_dataset = phono3py.get_displacement_dataset()
-        # print(disp_dataset)
         numatoms = len(scells_with_disps[0].get_scaled_positions())
         dummy_force = np.zeros((numatoms, 3))
-        # print(dummy_force)
+
         set_of_forces = []
         for scell in scells_with_disps:
             if scell is not None:
+                # this part is adapted from: https://web.archive.org/web/20200610084959/https://github.com/phonopy/phonopy/blob/develop/example/ase/8Si-phonon.py
+                # Copyright by Atsushi Togo
                 cell = Atoms(symbols=scell.get_chemical_symbols(),
                              scaled_positions=scell.get_scaled_positions(),
                              cell=scell.get_cell(),
                              pbc=True)
                 cell.set_calculator(potential)
                 forces = cell.get_forces()
-                # print(forces)
-
                 drift_force = forces.sum(axis=0)
                 print(("[Phonopy] Drift force:" + "%11.5f" * 3) % tuple(drift_force))
-                # Simple translational invariance
-                # TODO check if this is also correct for phono3py
                 for force in forces:
                     force -= drift_force / forces.shape[0]
                 set_of_forces.append(forces)
@@ -532,20 +455,14 @@ class PhononsQuippyFiniteDisplacements(PhonopyFiniteDisplacements):
                              symmetrize_fc3r=True)
 
         fc3 = phono3py.get_fc3()
-        # fc2 = phono3py.get_fc2()
 
         show_drift_fc3(fc3)
-        # show_drift_force_constants(fc2, name='fc2')
         return phono3py
 
     def _get_optimized_cell(self, structure, potential):
-        # TODO: optimize this cell!
-        # will optimize the cell with ase and any potential
-        # will also optimize cell
         atoms = self._get_ase_from_pmg(structure)
         atoms.set_calculator(potential)
 
-        # structure optimization
         try:
 
             sf = UnitCellFilter(atoms)
@@ -591,11 +508,11 @@ class PhononsQuippyFiniteDisplacements(PhonopyFiniteDisplacements):
                          cell=scell.get_cell(),
                          pbc=True)
             cell.set_calculator(potential)
+            # this part is adapted from: https://web.archive.org/web/20200610084959/https://github.com/phonopy/phonopy/blob/develop/example/ase/8Si-phonon.py
+            # Copyright by Atsushi Togo
             forces = cell.get_forces()
             drift_force = forces.sum(axis=0)
             print(("[Phonopy] Drift force:" + "%11.5f" * 3) % tuple(drift_force))
-            # Simple translational invariance
-            # TODO: understand this part!
             for force in forces:
                 force -= drift_force / forces.shape[0]
             set_of_forces.append(forces)

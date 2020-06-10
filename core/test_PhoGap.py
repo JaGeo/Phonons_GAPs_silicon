@@ -112,6 +112,11 @@ class TestComparePhononBs(unittest.TestCase):
         self.assertNotAlmostEqual(self.compare2.rms_overall(), 0)
         self.assertAlmostEqual(self.compare3.rms_overall(), 0.1)
 
+    def test_rms_overall_2(self):
+        self.assertAlmostEqual(self.compare.rms_overall_second_definition(), 0)
+        self.assertNotAlmostEqual(self.compare2.rms_overall_second_definition(), 0)
+        self.assertAlmostEqual(self.compare3.rms_overall_second_definition(), 0.1)
+
     def test_kdep_rms(self):
         for el in self.compare.rms_kdep():
             self.assertAlmostEqual(el, 0.0)
