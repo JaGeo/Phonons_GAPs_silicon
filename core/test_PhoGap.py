@@ -206,13 +206,7 @@ class TestPhononsQuippyFiniteDisplacements(unittest.TestCase):
         self.structure_conv = Structure.from_file(os.path.join(testfile_dir, "POSCAR.conv"))
         self.phononsquippy = PhononsQuippyFiniteDisplacements(structure=self.structure, potential=FakeCalc,
                                                               kpoint_density=100, kpoint_density_phono3py=100)
-        # structure:Structure, potential, smat=None, path_parameters="phonopy.yaml",
-        # npoints_band=51, kpoint_density=12000, kpoint_density_phono3py=1000, displacementdistance=0.01,
-        # set_thermal_conductivity:bool=False,
-        # displacementdistancephono3py:float=0.03, work_with_primitive:bool=True, max_distance_third_order=None,
-        # temperature_range_kappa=range(50, 1001, 5))
 
-    # def run_all(self):
     def test_run_all(self):
         self.phononsquippy.run_all()
         for ilength, length in enumerate(self.phononsquippy.optimized_structure.lattice.abc):
@@ -257,16 +251,6 @@ class TestPhononsQuippyFiniteDisplacements(unittest.TestCase):
 
     def test_parameters_work_with_primitive(self):
 
-        # Potential=MagicMock()
-        # Potential.get_potential_energy=MagicMock(return_value=-5.0)
-        # Potential.get_stress=MagicMock(return_value=np.array([0.0]*6))
-        # #print(Potential.get_stress())
-        # Potential.get_forces=MagicMock(side_effect=[np.array([np.array([0.0] * 3)] * self.structure_conv.num_sites),np.array([np.array([0.0] * 3)] * self.structure_conv.num_sites),np.array([np.array([0.0] * 3)] * self.structure_conv.num_sites),np.array([np.array([0.0] * 3)] * self.structure_conv.num_sites),np.array([np.array([0.1] * 3)] * 16), np.array([np.array([0.1] * 3)] * 16)])
-        # #print(Potential.get_forces())
-        #
-        #
-        #
-        #
         phononsquippy = PhononsQuippyFiniteDisplacements(structure=self.structure_conv, potential=FakeCalc,
                                                          kpoint_density=10, npoints_band=1, work_with_primitive=False,
                                                          set_phonons=False)
@@ -292,7 +276,6 @@ class TestPhononsQuippyFiniteDisplacements(unittest.TestCase):
             ValueError("A kappa-m111.hdf5 exists. Please remove it before you restart the test")
         except:
             print("phono3py not implemented")
-        # write a test to test kpoint density and influence on kappa (similar to density tests)
 
     def test_parameters_displacementdistancephono3py(self):
 
@@ -329,7 +312,6 @@ class TestPhononsQuippyFiniteDisplacements(unittest.TestCase):
                     for xyz1, xyz2 in zip(atoms1.coords, atoms2.coords):
                         if abs(xyz1 - xyz2) > 1e-3:
                             notthesame = True
-                            # print(str(xyz1)+' '+ str(xyz2))
             self.assertTrue(notthesame)
 
         except:
@@ -388,8 +370,6 @@ class TestPhononsQuippyFiniteDisplacements(unittest.TestCase):
             print("phono3py not imported")
 
     def test_kappa_at_temperature(self):
-        # values = {100: {'xx': 1, 'yy': 2, 'zz': 3, 'xz': 4, 'xy': 5, 'yz': 6}}
-
         phononsquippy = PhononsQuippyFiniteDisplacements(structure=self.structure, potential=FakeCalc,
                                                          kpoint_density=100, kpoint_density_phono3py=100)
         phononsquippy.temperature_range_kappa = [100, 200]
@@ -448,9 +428,6 @@ class TestPhononsQuippyFiniteDisplacements(unittest.TestCase):
                                           yz=False, filename=filename)
             self.assertTrue(os.path.exists(filename))
 
-        # , mean_exp_data_T=None, mean_exp_data=None, exp_data_xx=None, exp_data_yy=None,
-
-    #
     def test_get_thermal_conductivity_matrix(self):
         try:
             phononsquippy = PhononsQuippyFiniteDisplacements(structure=self.structure, potential=FakeCalc,
@@ -467,9 +444,7 @@ class TestPhononsQuippyFiniteDisplacements(unittest.TestCase):
         except:
             print("phono3py not implemented")
 
-    # def _get_phono3pyobject_phono3py(self, structure, potential, kpoint_density):
     def test_get_phono3pyobject_phono3py(self):
-        # test if phono3py object is generated and has second and third order force constants
         try:
             phononsquippy = PhononsQuippyFiniteDisplacements(structure=self.structure, potential=FakeCalc,
                                                              kpoint_density=100, kpoint_density_phono3py=100,
@@ -478,7 +453,6 @@ class TestPhononsQuippyFiniteDisplacements(unittest.TestCase):
                                                              max_distance_third_order=1.5)
             phononsquippy.run_all()
             self.assertEqual(phononsquippy.get_phono3pyobject_phono3py(), Phono3py)
-            # teste _get_thermal_coductivity_matrix
         except:
             print("phono3py not implemented")
 
@@ -487,7 +461,6 @@ class TestPhononsQuippyFiniteDisplacements(unittest.TestCase):
         for ilength, length in enumerate(struct_opt.lattice.abc):
             self.assertNotAlmostEqual(length, self.structure.lattice.abc[ilength])
 
-    # def _get_potential_energy(self, structure, potential):
     def test_get_potential_energy(self):
         energy = self.phononsquippy._get_potential_energy(self.structure, FakeCalc)
         # just make sure it does something

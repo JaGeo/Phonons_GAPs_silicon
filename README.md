@@ -11,5 +11,6 @@ phono3py 1.18.2
 quippy (including  the  GAP  code,  development  version  of  10  Jan 2020, see https://github.com/libAtoms/QUIP for help with the installation)
 
 You have to download all potentials from zenodo.org and adapt the filepaths in the script folder accordingly. Please make sure that they are correct. Otherwise, the code won't work.
+To test the code, you have to add the FakeCalculator.py from the following repo:
 
-
+This code is licensed under a BSD 3-Clause License. 
