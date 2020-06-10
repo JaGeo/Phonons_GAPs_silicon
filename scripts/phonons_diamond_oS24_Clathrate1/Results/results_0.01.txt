@@ -1,4 +1,4 @@
-Pot Structure RMS2 Mean_absolute_perc_error
+Pot Structure RMS
 GAP18 mp-149 0.14747484136445438
 GAP18 oS24 0.5262531006041915
 GAP18 Clathrate-1 1.114465875947021

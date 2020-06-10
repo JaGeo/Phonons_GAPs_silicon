@@ -1,30 +1,46 @@
 import os
 
-from pymatgen.core.structure import Structure
-
 from PhoGap import PhononsQuippyFiniteDisplacements
-
+from pymatgen.core.structure import Structure
 from pymatgen.symmetry.bandstructure import HighSymmKpath
 
-path_to_potential="/CECI/home/ucl/modl/jgeorge/Potentials"
+path_to_potential = "/CECI/home/ucl/modl/jgeorge/Potentials"
 
+# Please adapt the following lines according to your folder structure.
+potential_filenames = [str(os.path.join(path_to_potential, "gp_iter6_sparse9k.xml")),
+                       str(os.path.join(path_to_potential, "07_fit/04_GAP-18C/nsp_9000/gp_iter6C.xml")),
+                       str(os.path.join(path_to_potential, "07_fit/04_GAP-18C/nsp_9000_onlydisp/gp_iter6C.xml")),
+                       str(os.path.join(path_to_potential, "07_fit/04_GAP-18C/nsp_9000_3000/fas_0.0010/gp_iter6C.xml")),
+                       str(os.path.join(path_to_potential, "07_fit/04_GAP-18C/nsp_9000_3000/fas_0.0100/gp_iter6C.xml")),
+                       str(os.path.join(path_to_potential,
+                                        "07_fit/06_GAP-18C_wrnd/nsp_9000_3000_0.0100/gp_iter6C.xml")),
+                       str(os.path.join(path_to_potential, "07_fit/06_GAP-18C_wrnd/nsp_9000_3000_0.0010/gp_iter6C.xml"))
+                       ]
 
+# This will construct all paths for the potentials, please adapt to the potentials that you would like to use
+potential_names = ["GAP18",
+                   "04_GAP-18C_nsp_9000",
+                   "04_GAP-18C_nsp_9000_onlydisp",
+                   "04_GAP-18C_nsp_9000_3000_fas_0.0010",
+                   "04_GAP-18C_nsp_9000_3000_fas_0.0100",
+                   "06_GAP-18C_wrnd_nsp_9000_3000_0.0100",
+                   "06_GAP-18C_wrnd_nsp_9000_3000_0.0010"
+                   ]
 structure_mp_149 = Structure.from_file("POSCAR_diamond")
 
-#get conventional cell
+# get conventional cell
 kpath = HighSymmKpath(structure_mp_149, symprec=0.01)
 structure_mp_149 = kpath.conventional
-#test supercell size!
 
-
+# displacement for phono3py
 DISPLACEMENT_DISTANCE = 0.03
-
 
 structures = [structure_mp_149]
 structure_names = ["mp-149"]
-
+# supercell matrix
 supercells_matrix = [[[2, 0, 0], [0, 2, 0], [0, 0, 2]]]
 
+# reference data from DFT computation
 reference_data_mean = [
     5748.268,
     4529.575,
@@ -412,43 +428,17 @@ reference_data_T = [
     995.0,
     1000.0]
 
-
-
-
-
-potential_filenames = [str(os.path.join(path_to_potential,"gp_iter6_sparse9k.xml")),
-                       str(os.path.join(path_to_potential,"07_fit/04_GAP-18C/nsp_9000/gp_iter6C.xml")),
-                       str(os.path.join(path_to_potential,"07_fit/04_GAP-18C/nsp_9000_onlydisp/gp_iter6C.xml")),
-                       str(os.path.join(path_to_potential,"07_fit/04_GAP-18C/nsp_9000_3000/fas_0.0010/gp_iter6C.xml")),
-                       str(os.path.join(path_to_potential,"07_fit/04_GAP-18C/nsp_9000_3000/fas_0.0100/gp_iter6C.xml" )),
-                       str(os.path.join(path_to_potential,"07_fit/06_GAP-18C_wrnd/nsp_9000_3000_0.0100/gp_iter6C.xml")),
-                       str(os.path.join(path_to_potential,"07_fit/06_GAP-18C_wrnd/nsp_9000_3000_0.0010/gp_iter6C.xml")) 
-]
-
-
-
-potential_names = ["GAP18",
-"04_GAP-18C_nsp_9000",
-"04_GAP-18C_nsp_9000_onlydisp",
-"04_GAP-18C_nsp_9000_3000_fas_0.0010",
-"04_GAP-18C_nsp_9000_3000_fas_0.0100",
-"06_GAP-18C_wrnd_nsp_9000_3000_0.0100",
-"06_GAP-18C_wrnd_nsp_9000_3000_0.0010"
-]
-
-
-
-
-
-
-
+# this should not have an influence on the overall calculation
 npoints_band = 51
 kpoint_density = 12000
+
+# kpoint density for phono3py calculation
 kpoint_density_phono3py = 12000
-foldername="Results"
-with open(os.path.join(foldername,"results.txt"), 'w') as f:
+foldername = "Results"
+with open(os.path.join(foldername, "results.txt"), 'w') as f:
     f.write("Pot Structure RMS RMS300 Kappa300 Kappa600 Kappa900\n")
 start_from_files = False
+
 for ipot, pot in enumerate(potential_filenames[0:], 0):
     try:
         from quippy import *
@@ -484,7 +474,7 @@ for ipot, pot in enumerate(potential_filenames[0:], 0):
         kappa_600 = runner.kappa_at_temperature(temperature=600, whichvalue='xx')
         kappa_900 = runner.kappa_at_temperature(temperature=900, whichvalue='xx')
 
-        with open(os.path.join(foldername,"results.txt"), 'a') as f:
+        with open(os.path.join(foldername, "results.txt"), 'a') as f:
             f.write(str(potential_names[ipot]) + " " + str(structure_names[istructure]) + " " + str(rms) + " " + str(
                 rms_300) + " " + str(kappa_300) + " " + str(kappa_600) + " " + str(kappa_900) + "\n")
-        os.rename("kappa-m111111.hdf5",os.path.join(foldername,potential_names[ipot]+'_kappa-m111111.hdf5'))
+        os.rename("kappa-m111111.hdf5", os.path.join(foldername, potential_names[ipot] + '_kappa-m111111.hdf5'))
