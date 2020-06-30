@@ -8,24 +8,20 @@ path_to_potential = "/CECI/home/ucl/modl/jgeorge/Potentials"
 
 # Please adapt the following lines according to your folder structure.
 potential_filenames = [str(os.path.join(path_to_potential, "gp_iter6_sparse9k.xml")),
-                       str(os.path.join(path_to_potential, "07_fit/04_GAP-18C/nsp_9000/gp_iter6C.xml")),
-                       str(os.path.join(path_to_potential, "07_fit/04_GAP-18C/nsp_9000_onlydisp/gp_iter6C.xml")),
-                       str(os.path.join(path_to_potential, "07_fit/04_GAP-18C/nsp_9000_3000/fas_0.0010/gp_iter6C.xml")),
-                       str(os.path.join(path_to_potential, "07_fit/04_GAP-18C/nsp_9000_3000/fas_0.0100/gp_iter6C.xml")),
-                       str(os.path.join(path_to_potential,
-                                        "07_fit/06_GAP-18C_wrnd/nsp_9000_3000_0.0100/gp_iter6C.xml")),
-                       str(os.path.join(path_to_potential, "07_fit/06_GAP-18C_wrnd/nsp_9000_3000_0.0010/gp_iter6C.xml"))
-                       ]
+                       str(os.path.join(path_to_potential, "Fig_5/GAP-18_plus_SCs_f0.01/gp_iter6C.xml")),
+                       str(os.path.join(path_to_potential, "Fig_5/GAP-18_plus_SCs_f0.001/gp_iter6C.xml"))]
+
+
+
+
+
+
+                   
 
 # This will construct all paths for the potentials, please adapt to the potentials that you would like to use
 potential_names = ["GAP18",
-                   "04_GAP-18C_nsp_9000",
-                   "04_GAP-18C_nsp_9000_onlydisp",
-                   "04_GAP-18C_nsp_9000_3000_fas_0.0010",
-                   "04_GAP-18C_nsp_9000_3000_fas_0.0100",
-                   "06_GAP-18C_wrnd_nsp_9000_3000_0.0100",
-                   "06_GAP-18C_wrnd_nsp_9000_3000_0.0010"
-                   ]
+                   "Fig_5_GAP-18_plus_SCs_f0.01",
+                   "Fig_5_GAP-18_plus_SCs_f0.001"]
 structure_mp_149 = Structure.from_file("POSCAR_diamond")
 
 # get conventional cell

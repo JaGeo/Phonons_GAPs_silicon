@@ -13,7 +13,7 @@ phono3py 1.18.2
 
 quippy (including  the  GAP  code,  development  version  of  10  Jan 2020, see https://github.com/libAtoms/QUIP for help with the installation)
 
-You have to download all potentials from zenodo.org and adapt the filepaths in the script folder accordingly. Please make sure that they are correct. Otherwise, the code won't work.
+You have to download all potentials from zenodo.org (https://doi.org/10.5281/zenodo.3924402), unzip the files and adapt the filepaths in the two scripts of the folder accordingly. Please make sure that they are correct. Otherwise, the code won't work.
 
 To test the the core class of the code, you have to add the FakeCalculator.py to core from the following repo: https://github.com/JaGeo/FakeCalculator/ (https://zenodo.org/record/3888134)
 
